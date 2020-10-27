@@ -1,5 +1,6 @@
 # space-shooter
- Első játékom Löve2D-ben. Ez a repository játék forráskódját tartalmazza.
+ Árkád stílusú lövölde játék.
+ <img src="1.jpg">
 # libraries
  [colors.lua](https://github.com/davegamedev/my-libs/blob/main/colors.lua)
 # sprites
