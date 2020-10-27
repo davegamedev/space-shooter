@@ -11,6 +11,7 @@ function love.load()
     gameOtherFont = love.graphics.newFont(16)
     
     gameState = 1
+    score = 0
 
     sprites = {}
     sprites.background = love.graphics.newImage("sprites/background_darkPurple.png")
@@ -22,7 +23,6 @@ function love.load()
     background = {}
     background.x = 0
     background.y = -800
-    background.h = 1600
     background.speed = 200
 
     player = {}
@@ -34,7 +34,6 @@ function love.load()
     player.lifes = 3
 
     meteors = {}
-    meteorRot = 0
     createMeteorTimerMax = 0.35 
     createMeteorTimer = createMeteorTimerMax
 
@@ -42,12 +41,9 @@ function love.load()
     canShoot = true
     canShootTimerMax = 0.25
     canShootTimer = canShootTimerMax
-
-    score = 0
 end
 
 function love.update(dt)
-    -- Background update y position
     if background.y <= 0 then
         background.y = background.y + background.speed * dt
     else
@@ -55,7 +51,6 @@ function love.update(dt)
         background.y = background.y + background.speed * dt
     end
 
-    -- Player move
     if love.keyboard.isDown("right") then
         player.x = player.x + player.speed * dt
     end
@@ -63,7 +58,6 @@ function love.update(dt)
         player.x = player.x - player.speed * dt
     end
 
-    -- Player bounds
     if player.x < 0 then
         player.x = 0;
     end
@@ -71,7 +65,6 @@ function love.update(dt)
         player.x = windowWidth - player.w
     end
     
-    -- Player shoot the laser
     if canShootTimer > 0 then
         canShootTimer = canShootTimer - dt
     else
@@ -81,14 +74,11 @@ function love.update(dt)
         shootLaser()
     end
 
-    -- Check player lifes
     if player.lifes <= 0 then
         player.lifes = 0
-        -- love.event.quit()
         gameState = 1
     end
     
-    -- Meteor auto spawn
     createMeteorTimer = createMeteorTimer - dt
     if createMeteorTimer <= 0 and gameState == 2 then
         spawnMeteor()
@@ -96,18 +86,14 @@ function love.update(dt)
     end
     
     for i, m in ipairs(meteors) do
-        -- Meteors move
         m.y = m.y + m.speed * dt
-        -- Meteors remove collide window height
         if m.y > windowHeight or gameState == 1 then
             table.remove(meteors, i)
         end
     end
 
     for i, l in ipairs(lasers) do
-        -- Laser move
         l.y = l.y - l.speed * dt
-        -- Laser remove collide window top
         if l.y < 0 then
             table.remove(lasers, i)
         end
@@ -115,17 +101,13 @@ function love.update(dt)
 
     for i, m in ipairs(meteors) do
         for j, l in ipairs(lasers) do
-            -- Check the meteor and laser collision
             if checkCollision(m.x, m.y, m.w, m.h, l.x, l.y, l.w, l.h) then
-                -- Remove the items for lists and add score
                 table.remove(lasers, j)
                 table.remove(meteors, i)
                 score = score + 1
             end
         end
-        -- Check the meteor and player collision
         if checkCollision(m.x, m.y, m.w, m.h, player.x, player.y, player.w, player.h) then
-            -- Remove the meteor and extract player lifes
             table.remove(meteors, i)
             player.lifes = player.lifes - 1
         end
